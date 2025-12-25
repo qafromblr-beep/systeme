@@ -1,7 +1,7 @@
 pipeline {
     agent any
 triggers {
-        cron('H 13 * * 1-5')
+        cron('15 13 * * 1-5')
     }
     tools {
         // Это имя 'allure' должно совпадать с именем в Global Tool Configuration
