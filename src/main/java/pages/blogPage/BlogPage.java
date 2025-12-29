@@ -40,7 +40,8 @@ public class BlogPage extends BasePage {
     public void clickClosePopup() {
         try {
             waitAndSwitchToFrame(popupIframe);
-            waitElementToBeClickable(closePopupButton).click();
+            WebElement button = waitElementToBeClickable(closePopupButton);
+            jsClick(button); // Используем JS клик вместо обычного
         } finally {
             switchToDefaultContent();
         }

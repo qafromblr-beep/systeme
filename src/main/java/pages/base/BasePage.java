@@ -35,4 +35,10 @@ public class BasePage {
     public void switchToDefaultContent() {
         driver.switchTo().defaultContent();
     }
+
+    public void jsClick(WebElement element) {
+        ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
+
+
 }
