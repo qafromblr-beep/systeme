@@ -18,13 +18,18 @@ triggers {
         stage('Run Tests') {
             steps {
                 script {
-                    // 1. Запускаем тесты (используем || true, чтобы пайплайн не падал до генерации отчета, если тест упадет)
+                    // 1. Запускаем контейнер.
+                    // Используем '|| true', чтобы Jenkins продолжил работу при падении тестов.
                     sh 'docker run --name temp-results systeme-qa-test || true'
 
-                    // 2. Копируем результаты из контейнера в рабочую папку Jenkins
-                    sh 'docker cp temp-results:/app/allure-results ./'
+                    // 2. Копируем результаты.
+                    // ВАЖНО: Если в Dockerfile путь другой, исправьте /app/target/allure-results
+                    sh 'docker cp temp-results:/app/target/allure-results ./'
 
-                    // 3. Удаляем временный контейнер
+                    // Если папка называется просто allure-results в корне контейнера:
+                    // sh 'docker cp temp-results:/app/allure-results ./'
+
+                    // 3. Удаляем контейнер
                     sh 'docker rm temp-results'
                 }
             }
