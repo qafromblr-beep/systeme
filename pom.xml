@@ -15,15 +15,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <aspectj.version>1.9.22.1</aspectj.version>
         <testng.version>7.10.2</testng.version>
+        <allure.version>2.30.0</allure.version>
+        <log4j.version>2.24.3</log4j.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <!-- <testngXML>testng.xml</testngXML>-->
     </properties>
-
 
     <build>
         <plugins>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -33,62 +31,65 @@
                 </configuration>
             </plugin>
 
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <!-- Запуск в 2 независимых процессах -->
+                    <excludes>
+                        <exclude>**/BaseTest.java</exclude>
+                        <exclude>**/TestListener.java</exclude>
+                    </excludes>
                     <forkCount>2</forkCount>
-                    <!-- Параллельное выполнение методов внутри каждого процесса -->
                     <parallel>methods</parallel>
                     <threadCount>2</threadCount>
                     <rerunFailingTestsCount>2</rerunFailingTestsCount>
-                </configuration>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
 
+                        <systemPropertyVariables>
+                            <!-- Используем переменную Maven для указания точного пути -->
+                            <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                        </systemPropertyVariables>
+                        <!-- ... остальные настройки ... -->
+
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjrt</artifactId>
+                        <artifactId>aspectjweaver</artifactId>
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
 
+            <!-- Плагин для генерации отчетов -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.15.2</version> <!-- Актуальная версия плагина -->
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
-
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.37.0</version>
+            <version>4.27.0</version>
         </dependency>
 
-
-
-        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver -->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <version>4.37.0</version>
-        </dependency>
-
-
-
-        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.8</version>
+            <version>42.7.4</version>
         </dependency>
 
-
-
-        <!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -96,74 +97,40 @@
             <scope>test</scope>
         </dependency>
 
-
-        <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.10.2</version>
+            <version>${testng.version}</version>
         </dependency>
 
-        <!-- Allure для TestNG -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
-            <version>2.30.0</version>
-            <scope>test</scope>
+            <version>${allure.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-java-commons</artifactId>
-            <version>2.30.0</version>
-        </dependency>
-
-
-        <!-- SLF4J API -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
+            <version>2.0.16</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-
-
-        <!-- Log4j 2 Core -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.20.0</version>
+            <version>${log4j.version}</version>
         </dependency>
 
-        <!-- Log4j 2 API (если нужен совместимый API) -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.20.0</version>
+            <version>${log4j.version}</version>
         </dependency>
 
-        <!-- Bridge: SLF4J to Log4j 2 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.20.0</version>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
-
-        <!-- Опционально: SLF4J with Logback (если нужно оставить Logback, не используйте этот bridge) -->
-
-
-
-
-
-
     </dependencies>
-
-
-
 </project>
