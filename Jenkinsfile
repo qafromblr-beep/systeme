@@ -18,19 +18,18 @@ triggers {
         stage('Run Tests') {
             steps {
                 script {
-                    // 1. Запускаем контейнер.
-                    // Используем '|| true', чтобы Jenkins продолжил работу при падении тестов.
+                    // 1. Удаляем старый контейнер, если он остался после сбоя
+                    sh 'docker rm -f temp-results || true'
+
+                    // 2. Запускаем тесты
                     sh 'docker run --name temp-results systeme-qa-test || true'
 
-                    // 2. Копируем результаты.
-                    // ВАЖНО: Если в Dockerfile путь другой, исправьте /app/target/allure-results
+                    // 3. Копируем результаты из ПРАВИЛЬНОГО пути (в Maven это target/allure-results)
+                    // Добавлена точка в конце, чтобы скопировать содержимое
                     sh 'docker cp temp-results:/app/target/allure-results ./'
 
-                    // Если папка называется просто allure-results в корне контейнера:
-                    // sh 'docker cp temp-results:/app/allure-results ./'
-
-                    // 3. Удаляем контейнер
-                    sh 'docker rm temp-results'
+                    // 4. Чистим за собой
+                    sh 'docker rm -f temp-results'
                 }
             }
         }
