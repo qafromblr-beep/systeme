@@ -1,25 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <!-- Улучшенный паттерн для тестов: время, поток, уровень и сокращенное имя класса -->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{1.} - %msg%n"/>
         </Console>
 
-        <!-- При необходимости можно добавить файл журнала -->
-        <RollingFile name="File" fileName="logs/app.log" filePattern="logs/app-%d{yyyy-MM-dd}-.log.gz">
+        <!-- RollingFile для долгосрочного хранения логов -->
+        <RollingFile name="File" fileName="target/logs/test-run.log"
+                     filePattern="target/logs/archive/test-run-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/> <!-- Ротация по размеру удобнее для автотестов -->
                 <TimeBasedTriggeringPolicy />
             </Policies>
+            <DefaultRolloverStrategy max="5"/>
         </RollingFile>
     </Appenders>
 
     <Loggers>
-        <!-- Переопределите для вашего пакета/классов -->
-        <Logger name="com.yourCompany" level="debug" additivity="false">
+        <!-- ЗАМЕНИТЕ НА ВАШ ПАКЕТ: Это заставит ваши тесты писать подробно (DEBUG) -->
+        <Logger name="io.systeme.test" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Logger>
 
+        <!-- Логи сторонних библиотек (Selenium, OkHttp) будут только уровня INFO и выше -->
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
