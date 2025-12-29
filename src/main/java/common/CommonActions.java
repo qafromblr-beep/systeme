@@ -16,17 +16,14 @@ public class CommonActions {
         ChromeOptions options = new ChromeOptions();
 
         // 1. Настройка бинарного файла для Docker (Alpine)
-        // Читаем путь из ENV CHROME_BIN, который вы указали в Dockerfile
+        // Читаю путь из ENV CHROME_BIN, который указал в Dockerfile
         String chromeBin = System.getenv("CHROME_BIN");
         if (chromeBin != null && !chromeBin.isEmpty()) {
             options.setBinary(chromeBin);
         } else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-            // Если ENV нет, но это Linux — пробуем стандартный путь Alpine
             options.setBinary("/usr/bin/chromium-browser");
         }
-        // Если ОС Windows, setBinary не вызывается, и Selenium сам найдет Chrome
 
-        // 2. Современные аргументы для 2025 года
         options.addArguments("--headless=new"); // Новый headless режим
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-gpu");
@@ -52,7 +49,6 @@ public class CommonActions {
             }
         } catch (Exception e) {
             System.err.println("Ошибка при создании WebDriver: " + e.getMessage());
-            // В 2025 году Selenium Manager дает детальные советы в тексте ошибки
         }
 
         if (driver != null) {
