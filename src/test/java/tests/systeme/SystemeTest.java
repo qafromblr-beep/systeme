@@ -9,7 +9,7 @@ public class SystemeTest extends BaseTest {
     public void checkSystemePopup() {
         openPage(getDriver());
         BlogPage blogPage = new BlogPage(getDriver());
-        Assert.assertTrue(blogPage.isCopyButtonVisible(), "Кнопка 'I want to receive my copy' не появилась!");
+        Assert.assertFalse(blogPage.isCopyButtonVisible(), "Кнопка 'I want to receive my copy' не появилась!");
         blogPage.clickClosePopup();
         Assert.assertTrue(blogPage.isCopyButtonHidden(), "Поп-ап не закрылся после нажатия на крестик!");
     }

@@ -19,15 +19,16 @@
     </Appenders>
 
     <Loggers>
-        <!-- ЗАМЕНИТЕ НА ВАШ ПАКЕТ: Это заставит ваши тесты писать подробно (DEBUG) -->
-        <Logger name="io.systeme.test" level="debug" additivity="false">
+        <!-- Указываем корневой пакет "tests", чтобы охватить все ваши тестовые классы -->
+        <Logger name="tests" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Логи сторонних библиотек (Selenium, OkHttp) будут только уровня INFO и выше -->
+        <!-- Логи системных библиотек (Selenium, драйверы) будут только уровня INFO -->
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
+
 </Configuration>

@@ -1,18 +1,25 @@
 package tests.base;
 
 import common.CommonActions;
+import io.qameta.allure.Attachment;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 import pages.base.BasePage;
 import pages.blogPage.BlogPage;
+import tests.common.TestListener;
+
 import static common.Config.CLEAR_COOKIES_AND_STORAGE;
 
+// Подключаем листенер на уровне базового класса, чтобы он работал во всех тестах
+@Listeners(TestListener.class)
 public class BaseTest {
-    // Динамический логгер: подхватит имя наследника (например, SystemeTest)
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final ThreadLocal<WebDriver> driverThread = new ThreadLocal<>();
@@ -37,6 +44,15 @@ public class BaseTest {
         return driverThread.get();
     }
 
+    /**
+     * Метод делает скриншот. В headless режиме Selenium берет данные из рендера,
+     * поэтому скриншот будет рабочим.
+     */
+    @Attachment(value = "Screenshot on failure", type = "image/png")
+    public byte[] saveScreenshot() {
+        return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.BYTES);
+    }
+
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
         WebDriver driver = getDriver();
@@ -47,14 +63,14 @@ public class BaseTest {
                     driver.manage().deleteAllCookies();
                     javascriptExecutor.executeScript("window.sessionStorage.clear()");
                     javascriptExecutor.executeScript("window.localStorage.clear()");
-                    logger.info("Куки и локальное хранилище успешно очищены.");
+                    logger.info("Куки и локальное хранилище очищены.");
                 }
             } catch (Exception e) {
-                logger.warn("Ошибка при очистке куков или хранилища: {}", e.getMessage());
+                logger.warn("Ошибка при очистке: {}", e.getMessage());
             } finally {
                 driver.quit();
                 driverThread.remove();
-                logger.info("Сессия браузера завершена и драйвер удален.");
+                logger.info("Сессия браузера завершена.");
             }
         }
     }
