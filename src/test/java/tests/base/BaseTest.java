@@ -24,7 +24,7 @@ import static common.Config.CLEAR_COOKIES_AND_STORAGE;
  */
 @Listeners(TestListener.class)
 public class BaseTest {
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(BaseTest.class);
 
     // ThreadLocal обеспечивает независимость драйверов при параллельном запуске
     private static final ThreadLocal<WebDriver> driverThread = new ThreadLocal<>();

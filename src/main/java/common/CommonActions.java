@@ -3,6 +3,8 @@ package common;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import java.time.Duration;
 import java.util.List;
@@ -11,6 +13,9 @@ import static common.Config.PLATFORM_AND_BROWSER;
 import static constants.Constant.IMPLICIT_WAIT;
 
 public class CommonActions {
+    private static final Logger logger = LoggerFactory.getLogger(CommonActions.class);
+
+
     public static WebDriver createDriver() {
         System.out.println("Инициализация WebDriver...");
         ChromeOptions options = new ChromeOptions();
@@ -48,14 +53,14 @@ public class CommonActions {
                 Assert.fail("Неподдерживаемая платформа или браузер: " + PLATFORM_AND_BROWSER);
             }
         } catch (Exception e) {
-            System.err.println("Ошибка при создании WebDriver: " + e.getMessage());
+            logger.error("Ошибка при создании WebDriver: " + e.getMessage());
         }
 
         if (driver != null) {
-            System.out.println("WebDriver успешно создан.");
+            logger.info("WebDriver успешно создан.");
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(IMPLICIT_WAIT));
         } else {
-            System.err.println("WebDriver не был инициализирован. Возвращен null.");
+            logger.error("WebDriver не был инициализирован. Возвращен null.");
         }
         return driver;
     }
