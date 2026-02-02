@@ -1,17 +1,28 @@
-# Используем образ Maven с JDK 21 (актуально для 2025 года)
-FROM maven:3.9.6-eclipse-temurin-21-alpine
+# 1. Используем легкий образ только с JDK (Alpine версия экономит место)
+FROM eclipse-temurin:21-jdk-alpine
 
-# Устанавливаем Chrome и ChromeDriver для запуска тестов внутри контейнера
+# 2. Устанавливаем Chrome и ChromeDriver
 RUN apk add --no-cache chromium chromium-chromedriver
 
-# Указываем путь к Chrome для Selenium
-ENV CHROME_BIN=/usr/bin/chromium-browser
-ENV CHROME_PATH=/usr/lib/chromium/
+# 3. Настраиваем переменные окружения
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/
 
-# Копируем проект в контейнер
 WORKDIR /app
-COPY pom.xml .
+
+# 4. Сначала копируем только файлы обертки и pom.xml
+# Это позволяет Docker кэшировать зависимости и не качать их заново при изменении кода
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+
+# Даем права на выполнение скрипту (важно для Linux-сред)
+RUN chmod +x mvnw
+
+# Скачиваем зависимости (опционально, ускоряет последующие сборки)
+RUN ./mvnw dependency:go-offline
+
+# 5. Копируем исходный код
 COPY src ./src
 
-# Запускаем тесты при старте контейнера
-CMD ["mvn", "clean", "test"]
+# 6. Запускаем через ./mvnw вместо системного mvn
+CMD ["./mvnw", "clean", "test"]

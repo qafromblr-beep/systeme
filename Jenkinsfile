@@ -1,16 +1,23 @@
 pipeline {
     agent any
-triggers {
+    triggers {
         cron('35 10 * * 1-5')
     }
     tools {
-        // Это имя 'allure' должно совпадать с именем в Global Tool Configuration
         allure 'allure'
     }
 
     stages {
+        stage('Checkout & Permissions') {
+            steps {
+                // Гарантируем, что скрипт будет исполняемым перед сборкой образа
+                sh 'chmod +x mvnw'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
+                // Используем стандартный тег, чтобы не плодить мусор
                 sh 'docker build -t systeme-qa-test .'
             }
         }
@@ -18,18 +25,18 @@ triggers {
         stage('Run Tests') {
             steps {
                 script {
-                    // 1. Удаляем старый контейнер, если он остался после сбоя
+                    // Очистка контейнера перед запуском
                     sh 'docker rm -f temp-results || true'
 
-                    // 2. Запускаем тесты
+                    // Запуск тестов. Ошибка теста не должна прерывать пайплайн,
+                    // чтобы отчет Allure все равно сгенерировался.
                     sh 'docker run --name temp-results systeme-qa-test || true'
 
-                    // 3. Копируем результаты из ПРАВИЛЬНОГО пути (в Maven это target/allure-results)
-                    // Добавлена точка в конце, чтобы скопировать содержимое
-                    sh 'docker cp temp-results:/app/target/allure-results ./'
+                    // Очищаем локальную папку перед копированием свежих результатов
+                    sh 'rm -rf allure-results && mkdir allure-results'
 
-                    // 4. Чистим за собой
-                    sh 'docker rm -f temp-results'
+                    // Копируем результаты из контейнера в рабочую директорию Jenkins
+                    sh 'docker cp temp-results:/app/target/allure-results/.' ./allure-results/
                 }
             }
         }
@@ -37,9 +44,11 @@ triggers {
 
     post {
         always {
-            // Генерируем красивый отчет
+            // Указываем путь к папке, в которую скопировали данные из контейнера
             allure includeProperties: false, results: [[path: 'allure-results']]
-            echo 'Allure report generated.'
+
+            // Удаляем контейнер после копирования данных
+            sh 'docker rm -f temp-results || true'
         }
     }
 }
