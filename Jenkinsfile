@@ -36,7 +36,7 @@ pipeline {
                     sh 'rm -rf allure-results && mkdir allure-results'
 
                     // Копируем результаты из контейнера в рабочую директорию Jenkins
-                    sh 'docker cp temp-results:/app/target/allure-results/.' ./allure-results/
+                    sh 'docker cp temp-results:/app/target/allure-results/. ./allure-results/'
                 }
             }
         }

@@ -25,4 +25,8 @@ RUN ./mvnw dependency:go-offline
 COPY src ./src
 
 # 6. Запускаем через ./mvnw вместо системного mvn
-CMD ["./mvnw", "clean", "test"]
+CMD ["./mvnw", "clean", "test", "-Dchrome.binary=/usr/bin/chromium-browser"]
+
+
+
+
