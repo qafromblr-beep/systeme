@@ -35,7 +35,7 @@ public class CommonActions {
             WebDriverManager.chromedriver().setup();
         }
 
-        options.addArguments("--headless=new");
+   //     options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-dev-shm-usage");
